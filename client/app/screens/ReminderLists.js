@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, SafeAreaView, StyleSheet, ImageBackground, Image, ScrollView } from 'react-native';
+import {Animated, View, Text, SafeAreaView, StyleSheet, ImageBackground, Image, ScrollView } from 'react-native';
 import globalcss from '../../config/globalcss';
 import LogoFaded from '../assets/logofaded.svg';
 import { Entypo } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import {useDimensions} from '@react-native-community/hooks';
 import colors from '../../config/colors';
 import axios from 'axios'
+import ReminderBox from '../components/ReminderBox';
 
 function ReminderLists({navigation}) {
     const deviceHeight = useDimensions().screen.height
@@ -20,6 +21,7 @@ function ReminderLists({navigation}) {
         })
         return unsubscribe
     }, [navigation])
+    
 
     return (
         <SafeAreaView style={styles.background}>
@@ -33,17 +35,8 @@ function ReminderLists({navigation}) {
                             <View><Text style={styles.locationName}>{reminder.location.locationName}</Text></View>
                         </View>
                         {reminder.location.reminders.map(rem => {
-                            return <View key={rem.rem_id} style={styles.reminderBox}>
-                                        <View style={styles.checkCircle}></View>
-                                        <View>
-                                            <Text style={styles.reminderTitle}>{rem.reminderTitle}</Text>
-                                            {rem.remDescription && (
-                                                <Text style={styles.reminderDescription}>{rem.reminderDescription}</Text>
-                                            )}
-                                        </View>
-                                    </View>
+                            return <ReminderBox rem={rem} key={rem.rem_id}/>
                         })}
-                        
                     </View>
                 })}
             </View>
@@ -106,44 +99,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: colors.textPrimary
     },  
-
-    reminderBox: {
-        width: '100%',
-        height: 50,
-        marginTop: 5,
-        paddingHorizontal: 5,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 1,
-            height: 1
-        },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-        borderRadius: 5
-    },
-
-    checkCircle: {
-        width: 25,
-        height: 25,
-        borderWidth: 3,
-        borderColor: colors.primary,
-        borderRadius: 50,
-        marginRight: 20
-    },  
-
-    reminderTitle: {
-        fontWeight: '600',
-        fontSize: 16,
-        color: colors.textPrimary
-    },  
-
-    reminderDescription: {
-        color: colors.textSecondary
-    },
 
     addReminderBtn: {
         width: 50,
