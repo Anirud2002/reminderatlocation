@@ -3,8 +3,8 @@ const router =  express.Router()
 
 const NewReminder = require('../models/NewReminder')
 
-router.get('/getreminders', (req, res) => {
-    NewReminder.find({})
+router.get('/getreminders', async (req, res) => {
+    await NewReminder.find({})
     .then((result) => {
         res.send(result)
     })
@@ -12,7 +12,7 @@ router.get('/getreminders', (req, res) => {
 
 router.post('/add', (req, res) => {
     const {location} = req.body
-    console.log(location.locationName)
+
     NewReminder.findOne({"location.locationName": location.locationName}, (err, data) => {
         if (err){
             console.log(err)
@@ -26,9 +26,29 @@ router.post('/add', (req, res) => {
                 location
             })
             newReminder.save()
-            // res.send('Hurray save bhayo')
         }
     }) 
+})
+
+router.put("/deletereminder/:reminderId/:id", (req, res) => {
+    const {reminderId, id} = req.params
+
+    NewReminder.findById(reminderId, (err, doc) => {
+        if (err) console.log(err)
+        else if (doc.location.reminders.length === 1) {
+            doc.delete().then(() => {
+                NewReminder.find({})
+                .then(result => res.send(result))
+            })
+        } 
+        else{
+            doc.location.reminders = doc.location.reminders.filter(reminder => reminder.rem_id !== id)
+            doc.save().then(() => {
+                NewReminder.find({})
+                .then(result => res.send(result))
+            })
+        }
+    })
 })
 
 module.exports = router

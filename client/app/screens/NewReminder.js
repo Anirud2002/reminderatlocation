@@ -35,7 +35,6 @@ function NewReminder({navigation, options}) {
 
     const handleSubmitReminder = () => {
         setNewReminder({...newReminder, location: {...newReminder.location, reminders: newReminder.location.reminders.push(reminderDetails)}})
-        console.log(newReminder)
         axios.post('http://localhost:3000/reminder/add', newReminder)
         .then(res => {
             console.log(res.data)

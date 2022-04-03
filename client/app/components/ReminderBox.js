@@ -1,19 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {View, Text, Animated, StyleSheet} from 'react-native'
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { RectButton } from 'react-native-gesture-handler';
+import { RectButton, TouchableHighlight } from 'react-native-gesture-handler';
 import colors from '../../config/colors';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
-function ReminderBox({rem}) {
+function ReminderBox({rem, 
+    reminderId,
+    handleDeleteReminder, 
+    handleDoneReminder,
+    reminderClicked,
+    activeRemId
+}) {
+
 
     const renderRightActions = (progress, dragX) => {
         const trans = dragX.interpolate({
             inputRange: [0, 50, 100, 101],
             outputRange: [5, 10, 20, 21],
         });
+
         return (
-          <RectButton style={styles.leftAction} onPress={() => console.log("swiped")}>
+          <RectButton style={styles.leftAction} onPress={() => handleDeleteReminder(reminderId, rem)}>
             <Animated.Text
               style={[
                 styles.actionText,
@@ -30,7 +39,11 @@ function ReminderBox({rem}) {
     return (
         <Swipeable renderRightActions={renderRightActions}>
                     <View key={rem.rem_id} style={styles.reminderBox}>
-                        <View style={styles.checkCircle}></View>
+                        <TouchableHighlight style={styles.checkCircle} onPress={() => handleDoneReminder(reminderId, rem)}>
+                            {(reminderClicked && rem.rem_id === activeRemId) && (
+                                <View style={styles.circleChecked}></View>
+                            )}
+                        </TouchableHighlight>
                         <View>
                             <Text style={styles.reminderTitle}>{rem.reminderTitle}</Text>
                             {rem.remDescription && (
@@ -73,7 +86,17 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: colors.primary,
         borderRadius: 50,
-        marginRight: 20
+        marginRight: 20,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },  
+
+    circleChecked: {
+        width: 15,
+        height: 15,
+        borderRadius: 50,
+        backgroundColor: colors.primary
     },  
 
     reminderTitle: {

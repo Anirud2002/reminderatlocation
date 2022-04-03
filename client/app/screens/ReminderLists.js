@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Animated, View, Text, SafeAreaView, StyleSheet, ImageBackground, Image, ScrollView } from 'react-native';
+import React, {useState, useEffect, useRef} from 'react';
+import { View, Text, SafeAreaView, StyleSheet } from 'react-native';
 import globalcss from '../../config/globalcss';
 import LogoFaded from '../assets/logofaded.svg';
 import { Entypo } from '@expo/vector-icons';
@@ -12,6 +12,11 @@ import ReminderBox from '../components/ReminderBox';
 function ReminderLists({navigation}) {
     const deviceHeight = useDimensions().screen.height
     const [reminders, setReminders] = useState([])
+    let [reminderClicked, setReminderClicked] = useState(false)
+    let [activeRemId, setActiveRemId] = useState('')
+    const reminderClickedRef = useRef()
+    reminderClickedRef.current = reminderClicked
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get('http://localhost:3000/reminder/getreminders')
@@ -21,7 +26,34 @@ function ReminderLists({navigation}) {
         })
         return unsubscribe
     }, [navigation])
-    
+
+    const handleDeleteReminder = (reminderParentId, reminder) => {
+        axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
+        .then(res => {
+            setReminders(res.data)
+        })  
+    }
+
+    const handleDoneReminder = (reminderParentId, reminder) => {
+        reminderClicked = !reminderClicked
+        setReminderClicked(reminderClicked)
+
+        if (reminderClicked){
+            activeRemId = reminder.rem_id
+            setActiveRemId(activeRemId)
+        }
+        setTimeout(() => {
+            console.log(reminderClickedRef.current)
+            if(reminderClickedRef.current){
+                axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
+                .then(res => {
+                    setReminders(res.data)
+                    setReminderClicked(false)
+                }) 
+            }
+        }, 1000)
+         
+    }
 
     return (
         <SafeAreaView style={styles.background}>
@@ -35,13 +67,24 @@ function ReminderLists({navigation}) {
                             <View><Text style={styles.locationName}>{reminder.location.locationName}</Text></View>
                         </View>
                         {reminder.location.reminders.map(rem => {
-                            return <ReminderBox rem={rem} key={rem.rem_id}/>
+                            return <ReminderBox
+                                     handleDoneReminder={handleDoneReminder}
+                                    handleDeleteReminder={handleDeleteReminder}
+                                    rem={rem}
+                                    reminderId={reminder._id}
+                                    key={rem.rem_id}
+                                    reminderClicked={reminderClicked}
+                                    activeRemId={activeRemId}
+                                    />
                         })}
                     </View>
                 })}
             </View>
             <View style={{...styles.addReminderBtn, top: deviceHeight - 200}}>
-                <Entypo onPress={() => navigation.navigate('NewReminder')} size={50} name="plus" color={colors.secondary}/>
+                <Entypo onPress={() => navigation.navigate('NewReminder')}
+                    size={50} name="plus"
+                    color={colors.secondary}
+                />
             </View>
         </SafeAreaView>
     );

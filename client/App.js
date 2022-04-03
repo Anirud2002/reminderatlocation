@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import {useState, useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Easing, StyleSheet, Text, View } from 'react-native';
 import WelcomePage from './app/screens/WelcomePage';
 import ReminderLists from './app/screens/ReminderLists';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
@@ -12,6 +12,14 @@ import NewReminder from './app/screens/NewReminder';
 
 const Stack = createNativeStackNavigator(); 
 export default function App() {
+
+  const closeConfig = {
+    animation: 'timing',
+    config: {
+      duration: 500,
+      easing: Easing.linear
+    }
+  }
   
   return (
     <NavigationContainer>

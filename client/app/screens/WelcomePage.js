@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, StyleSheet, Image, Text } from 'react-native';
+import { View, StyleSheet, Image, Text, Animated } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import * as Font from 'expo-font'
 import colors from '../../config/colors';
@@ -9,26 +9,37 @@ import NewReminder from './NewReminder';
 function WelcomePage(props) {
     const {navigation} = props
     const [fontLoaded, setFontLoaded] = useState(false)
+    const opacity = useState(new Animated.Value(1))[0]
+
     useEffect(async () => {
         await Font.loadAsync({
             'Padauk-Regular': require('../assets/fonts/Padauk-Regular.ttf'),
         });
         setFontLoaded(true)
+
+        setTimeout(() => {
+            Animated.timing(opacity, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true
+            }).start()
+            navigation.navigate('ReminderLists')
+        }, 1000)
+
     }, [])
     if(fontLoaded){
     return (
-        <View style={styles.background} >
+        <Animated.View style={{...styles.background, opacity: opacity}} >
             <View style={styles.logoContainer}>
                 <Logo/>
                 <Text 
-                    onPress={() => navigation.navigate('ReminderLists')}
                     style={{...styles.logoTitle, 
                             fontFamily: fontLoaded && 'Padauk-Regular'
                         }}>
                             ReminderAtLocation
                 </Text>
             </View>
-        </View>
+        </Animated.View>
     );
     }else{
         return <Text>Thulu</Text>
