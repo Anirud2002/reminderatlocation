@@ -15,7 +15,7 @@ import uuid from 'react-native-uuid';
 function NewReminder({navigation, options}) {
     const ref = useRef()
     const deviceHeight = useDimensions().screen.height
-    const [newReminder, setNewReminder] = useState({
+    let [newReminder, setNewReminder] = useState({
         location: {
             locationName: '',
             reminders: [],
@@ -33,29 +33,31 @@ function NewReminder({navigation, options}) {
         reminderDescription: ''
     })
 
-    const handleSubmitReminder = () => {
-        setNewReminder({...newReminder, location: {...newReminder.location, reminders: newReminder.location.reminders.push(reminderDetails)}})
-        axios.post('http://localhost:3000/reminder/add', newReminder)
-        .then(res => {
-            console.log(res.data)
+    const handleSubmitReminder = async () => {
+        newReminder.location.reminders.push(reminderDetails)
+        setNewReminder(newReminder)
+        await axios.post('http://localhost:3000/reminder/add', newReminder)
+        .then((res) => {
+            if(res.data.success){
+                setNewReminder({
+                    location: {
+                        locationName: '',
+                        reminders: [],
+                        locationDetails: {
+                            lat: 0,
+                            lng: 0,
+                            radius: 0.1
+                        }
+                    }
+                })
+                ref.current.clear()
+                navigation.navigate('ReminderLists')
+            }
         })
         .catch(err => console.log(err))
 
-        setNewReminder({
-            location: {
-                locationName: '',
-                reminders: [],
-                locationDetails: {
-                    lat: 0,
-                    lng: 0,
-                    radius: 0.1
-                }
-            }
-        })
-        ref.current.clear()
-        setTimeout(() => {
-            navigation.navigate('ReminderLists')
-        }, 200)
+        
+        
 
     }
     return (
@@ -76,9 +78,9 @@ function NewReminder({navigation, options}) {
                             setNewReminder({...newReminder, location: {...newReminder.location, 
                                 locationName: details.name,
                                 locationDetails: {
+                                    ...newReminder.location.locationDetails,
                                     lat: details.geometry.location.lat,
                                     lng: details.geometry.location.lng,
-                                    radius: newReminder.location.locationDetails.radius,
                                 }
                             }})
                         }
@@ -104,8 +106,7 @@ function NewReminder({navigation, options}) {
                             setNewReminder({...newReminder, location: {
                             ...newReminder.location,
                             locationDetails: {
-                                lat: newReminder.location.locationDetails.lat,
-                                lng: newReminder.location.locationDetails.lng,
+                                ...newReminder.location.locationDetails,
                                 radius: Math.round(value * 10) / 10
                             }
                         }})}}

@@ -16,7 +16,7 @@ const uri = process.env.ATLAS_URI
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 .then(() => console.log('db connected'))
 .catch((err) => console.log(err))
-
+3
 app.use('/reminder', require('./routes/newReminder'))
 
 app.listen(port, () => {
