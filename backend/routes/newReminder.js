@@ -16,16 +16,19 @@ router.post('/add', (req, res) => {
     NewReminder.findOne({"location.locationName": location.locationName}, (err, data) => {
         if (err){
             console.log(err)
+            res.send({success: false})
         }
         else if(data){
             data.location.reminders.push(location.reminders[0])
             data.save()
+            res.send({success: true})
         }
         if(data === null){
             const newReminder = new NewReminder({
                 location
             })
             newReminder.save()
+            res.send({success: true})
         }
     }) 
 })

@@ -14,27 +14,40 @@ function ReminderLists({navigation}) {
     const [reminders, setReminders] = useState([])
     let [reminderClicked, setReminderClicked] = useState(false)
     let [activeRemId, setActiveRemId] = useState('')
+    const [action, setAction] = useState('')
     const reminderClickedRef = useRef()
     reminderClickedRef.current = reminderClicked
+
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get('http://localhost:3000/reminder/getreminders')
             .then(res => {
-                setReminders(res.data)
+                if(res.data){
+                    setReminders(res.data)
+                }
             })
         })
         return unsubscribe
     }, [navigation])
 
-    const handleDeleteReminder = (reminderParentId, reminder) => {
-        axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
-        .then(res => {
-            setReminders(res.data)
-        })  
-    }
+    // const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
+    //     reminderClicked = !reminderClicked
+    //     setReminderClicked(reminderClicked)
 
-    const handleDoneReminder = (reminderParentId, reminder) => {
+    //     if (reminderClicked){
+    //         activeRemId = reminder.rem_id
+    //         setActiveRemId(activeRemId)
+    //     }
+
+    //     axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
+    //     .then(res => {
+    //         setReminders(res.data)
+    //         setReminderClicked(false)
+    //     })  
+    // }
+
+    const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
         reminderClicked = !reminderClicked
         setReminderClicked(reminderClicked)
 
@@ -42,8 +55,8 @@ function ReminderLists({navigation}) {
             activeRemId = reminder.rem_id
             setActiveRemId(activeRemId)
         }
+
         setTimeout(() => {
-            console.log(reminderClickedRef.current)
             if(reminderClickedRef.current){
                 axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
                 .then(res => {
@@ -51,8 +64,7 @@ function ReminderLists({navigation}) {
                     setReminderClicked(false)
                 }) 
             }
-        }, 1000)
-         
+        }, 1200)
     }
 
     return (
@@ -68,8 +80,9 @@ function ReminderLists({navigation}) {
                         </View>
                         {reminder.location.reminders.map(rem => {
                             return <ReminderBox
-                                     handleDoneReminder={handleDoneReminder}
-                                    handleDeleteReminder={handleDeleteReminder}
+                                    // handleDoneReminder={handleDoneReminder}
+                                    // handleDeleteReminder={handleDeleteReminder}
+                                    handleDoneAndDeleteReminder={handleDoneAndDeleteReminder}
                                     rem={rem}
                                     reminderId={reminder._id}
                                     key={rem.rem_id}

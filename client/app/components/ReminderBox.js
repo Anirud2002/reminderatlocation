@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {View, Text, Animated, StyleSheet} from 'react-native'
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { RectButton, TouchableHighlight } from 'react-native-gesture-handler';
@@ -8,12 +8,30 @@ import axios from 'axios';
 
 function ReminderBox({rem, 
     reminderId,
-    handleDeleteReminder, 
-    handleDoneReminder,
+    // handleDeleteReminder, 
+    // handleDoneReminder,
+    handleDoneAndDeleteReminder,
     reminderClicked,
     activeRemId
 }) {
 
+    const leftFadeAnimation = useRef(new Animated.Value(0)).current
+    const leftFadeOpacity = useRef(new Animated.Value(1)).current
+
+    useEffect(() => {
+        setTimeout(() => {
+            if(reminderClicked && rem.rem_id === activeRemId){
+                Animated.timing(
+                    leftFadeAnimation,
+                    {
+                        toValue: -500,
+                        duration: 800,
+                        useNativeDriver: true
+                    }
+                ).start()
+            }
+        }, 1000)      
+    }, [reminderClicked])
 
     const renderRightActions = (progress, dragX) => {
         const trans = dragX.interpolate({
@@ -22,12 +40,12 @@ function ReminderBox({rem,
         });
 
         return (
-          <RectButton style={styles.leftAction} onPress={() => handleDeleteReminder(reminderId, rem)}>
+          <RectButton style={styles.leftAction} onPress={() => handleDoneAndDeleteReminder(reminderId, rem)}>
             <Animated.Text
               style={[
                 styles.actionText,
                 {
-                  transform: [{ translateX: trans }],
+                  transform: [{ translateX: trans} ],
                 },
               ]}>
               <Ionicons name="trash" size={28} color="black" />
@@ -38,8 +56,13 @@ function ReminderBox({rem,
 
     return (
         <Swipeable renderRightActions={renderRightActions}>
-                    <View key={rem.rem_id} style={styles.reminderBox}>
-                        <TouchableHighlight style={styles.checkCircle} onPress={() => handleDoneReminder(reminderId, rem)}>
+                    <Animated.View style={{...styles.reminderBox, 
+                    transform: [
+                        {translateX: leftFadeAnimation}
+                    ],
+                    opacity: leftFadeOpacity
+                    }}>
+                        <TouchableHighlight style={styles.checkCircle} onPress={() => handleDoneAndDeleteReminder(reminderId, rem)}>
                             {(reminderClicked && rem.rem_id === activeRemId) && (
                                 <View style={styles.circleChecked}></View>
                             )}
@@ -50,7 +73,7 @@ function ReminderBox({rem,
                                 <Text style={styles.reminderDescription}>{rem.reminderDescription}</Text>
                             )}
                         </View>
-                    </View>
+                    </Animated.View>
         </Swipeable>
     );
 }
