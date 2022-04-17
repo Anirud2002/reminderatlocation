@@ -1,24 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {View, Text, Animated, StyleSheet} from 'react-native'
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-import { RectButton, TouchableHighlight } from 'react-native-gesture-handler';
+import { RectButton, TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 import colors from '../../config/colors';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
 function ReminderBox({rem, 
     reminderId,
-    // handleDeleteReminder, 
-    // handleDoneReminder,
+    action,
+    setAction,
     handleDoneAndDeleteReminder,
     reminderClicked,
-    activeRemId
+    activeRemId,
+    navigation,
+    reminder
 }) {
 
     const leftFadeAnimation = useRef(new Animated.Value(0)).current
-    const leftFadeOpacity = useRef(new Animated.Value(1)).current
 
     useEffect(() => {
+        if(action === "DELETE"){
+            if(reminderClicked && rem.rem_id === activeRemId){
+                Animated.timing(
+                    leftFadeAnimation,
+                    {
+                        toValue: -500,
+                        duration: 800,
+                        useNativeDriver: true
+                    }
+                ).start()
+            }
+            return
+        }
         setTimeout(() => {
             if(reminderClicked && rem.rem_id === activeRemId){
                 Animated.timing(
@@ -40,7 +54,10 @@ function ReminderBox({rem,
         });
 
         return (
-          <RectButton style={styles.leftAction} onPress={() => handleDoneAndDeleteReminder(reminderId, rem)}>
+          <RectButton style={styles.leftAction} onPress={() => {
+              setAction("DELETE")
+              handleDoneAndDeleteReminder(reminderId, rem)
+          }}>
             <Animated.Text
               style={[
                 styles.actionText,
@@ -56,23 +73,32 @@ function ReminderBox({rem,
 
     return (
         <Swipeable renderRightActions={renderRightActions}>
-                    <Animated.View style={{...styles.reminderBox, 
+                    <Animated.View style={{
                     transform: [
                         {translateX: leftFadeAnimation}
-                    ],
-                    opacity: leftFadeOpacity
+                    ]
                     }}>
-                        <TouchableHighlight style={styles.checkCircle} onPress={() => handleDoneAndDeleteReminder(reminderId, rem)}>
-                            {(reminderClicked && rem.rem_id === activeRemId) && (
-                                <View style={styles.circleChecked}></View>
-                            )}
-                        </TouchableHighlight>
-                        <View>
-                            <Text style={styles.reminderTitle}>{rem.reminderTitle}</Text>
-                            {rem.remDescription && (
-                                <Text style={styles.reminderDescription}>{rem.reminderDescription}</Text>
-                            )}
-                        </View>
+                        <TouchableOpacity style={styles.reminderBox} onPress={() => {
+                            navigation.navigate('EditReminder', {
+                                parentReminder: reminder,
+                                rem
+                            })
+                        }}>
+                            <TouchableHighlight style={styles.checkCircle} onPress={() => {
+                                setAction("COMPLETED")
+                                handleDoneAndDeleteReminder(reminderId, rem)
+                            }}>
+                                {(reminderClicked && rem.rem_id === activeRemId) && (
+                                    <View style={styles.circleChecked}></View>
+                                )}
+                            </TouchableHighlight>
+                            <View>
+                                <Text style={styles.reminderTitle}>{rem.reminderTitle}</Text>
+                                {rem.remDescription && (
+                                    <Text style={styles.reminderDescription}>{rem.reminderDescription}</Text>
+                                )}
+                            </View>
+                        </TouchableOpacity>
                     </Animated.View>
         </Swipeable>
     );

@@ -31,22 +31,6 @@ function ReminderLists({navigation}) {
         return unsubscribe
     }, [navigation])
 
-    // const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
-    //     reminderClicked = !reminderClicked
-    //     setReminderClicked(reminderClicked)
-
-    //     if (reminderClicked){
-    //         activeRemId = reminder.rem_id
-    //         setActiveRemId(activeRemId)
-    //     }
-
-    //     axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
-    //     .then(res => {
-    //         setReminders(res.data)
-    //         setReminderClicked(false)
-    //     })  
-    // }
-
     const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
         reminderClicked = !reminderClicked
         setReminderClicked(reminderClicked)
@@ -64,7 +48,7 @@ function ReminderLists({navigation}) {
                     setReminderClicked(false)
                 }) 
             }
-        }, 1200)
+        }, action === "DELETE" ? 800 : 1200) 
     }
 
     return (
@@ -80,12 +64,14 @@ function ReminderLists({navigation}) {
                         </View>
                         {reminder.location.reminders.map(rem => {
                             return <ReminderBox
-                                    // handleDoneReminder={handleDoneReminder}
-                                    // handleDeleteReminder={handleDeleteReminder}
+                                    action={action}
+                                    setAction={setAction}
                                     handleDoneAndDeleteReminder={handleDoneAndDeleteReminder}
                                     rem={rem}
                                     reminderId={reminder._id}
+                                    reminder={reminder}
                                     key={rem.rem_id}
+                                    navigation={navigation}
                                     reminderClicked={reminderClicked}
                                     activeRemId={activeRemId}
                                     />

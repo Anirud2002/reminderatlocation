@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {AppRegistry, View, Text, SafeAreaView, StyleSheet, TextInput } from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { Ionicons } from '@expo/vector-icons';
@@ -9,37 +9,40 @@ import colors from '../../config/colors';
 import {useDimensions} from '@react-native-community/hooks'
 import { MaterialIcons } from '@expo/vector-icons'; 
 import axios from 'axios'
-import uuid from 'react-native-uuid';
 
-
-function NewReminder({navigation, options}) {
+function EditReminder({navigation, route}) {
+    const {parentReminder, rem} = route.params
     const ref = useRef()
+    useEffect(() => {
+        ref.current?.setAddressText(parentReminder.location.locationName)
+    }, [])
     const deviceHeight = useDimensions().screen.height
-    let [newReminder, setNewReminder] = useState({
+    let [editReminder, setEditReminder] = useState({
         location: {
-            locationName: '',
+            locationName: parentReminder.locationName,
             reminders: [],
             locationDetails: {
-                lat: 0,
-                lng: 0,
+                lat: parentReminder.location.locationDetails.lat,
+                lng: parentReminder.location.locationDetails.lng,
             }
         }
     })
 
     const [reminderDetails, setReminderDetails] = useState({
-        rem_id: uuid.v4(),
-        reminderTitle: '',
-        reminderDescription: '',
-        radius: 0.1
+        rem_id: rem.rem_id,
+        reminderTitle: rem.reminderTitle,
+        reminderDescription: rem.reminderDescription,
+        radius: rem.radius
     })
 
     const handleSubmitReminder = async () => {
-        newReminder.location.reminders.push(reminderDetails)
-        setNewReminder(newReminder)
-        await axios.post('http://localhost:3000/reminder/add', newReminder)
+        editReminder.location.reminders.push(reminderDetails)
+        setEditReminder(editReminder)
+        console.log(editReminder)
+        await axios.put(`http://localhost:3000/reminder/edit/${parentReminder._id}/${rem.rem_id}`, editReminder)
         .then((res) => {
             if(res.data.success){
-                setNewReminder({
+                setEditReminder({
                     location: {
                         locationName: '',
                         reminders: [],
@@ -64,7 +67,7 @@ function NewReminder({navigation, options}) {
             <LogoFaded style={styles.imageBackground}/>
             <View style={styles.header}>
                     <Ionicons onPress={() => navigation.goBack() } name='chevron-back' size={32} color='#000'/>
-                <Text style={styles.heading}>New Reminder</Text>
+                <Text style={styles.heading}>Edit Reminder</Text>
             </View>
             <View style={styles.inputContainer}>
                 <View style={styles.googleAutoComplete}>
@@ -74,10 +77,10 @@ function NewReminder({navigation, options}) {
                         placeholder='Search'
                         fetchDetails={true}
                         onPress={(data, details = null) => {
-                            setNewReminder({...newReminder, location: {...newReminder.location, 
+                            setEditReminder({...editReminder, location: {...editReminder.location, 
                                 locationName: details.name,
                                 locationDetails: {
-                                    ...newReminder.location.locationDetails,
+                                    ...editReminder.location.locationDetails,
                                     lat: details.geometry.location.lat,
                                     lng: details.geometry.location.lng,
                                 }
@@ -105,7 +108,7 @@ function NewReminder({navigation, options}) {
                             setReminderDetails({
                                 ...reminderDetails,
                                 radius: Math.round(value * 10) / 10
-                            })
+                            })    
                         }}
                     />
                 </View>
@@ -239,4 +242,4 @@ const styles = StyleSheet.create({
 
 AppRegistry.registerComponent('SliderExample', () => SliderExample);
 
-export default NewReminder;
+export default EditReminder;

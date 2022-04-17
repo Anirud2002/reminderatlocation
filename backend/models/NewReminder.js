@@ -13,7 +13,6 @@ const NewReminderSchema = mongoose.Schema({
         locationDetails: {
             lat: {type:Number, required: true},
             lng: {type:Number, required: true},
-            radius: {type:Number, required: true},
         }
     },
 
