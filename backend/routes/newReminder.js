@@ -23,7 +23,7 @@ router.post('/add', (req, res) => {
             data.save()
             res.send({success: true})
         }
-        if(data === null){
+        else{
             const newReminder = new NewReminder({
                 location
             })
@@ -31,6 +31,47 @@ router.post('/add', (req, res) => {
             res.send({success: true})
         }
     }) 
+})
+
+router.put("/edit/:reminderId/:id", (req, res) => {
+    const {reminderId, id} = req.params
+    const {location} = req.body
+    console.log(reminderId, id)
+    NewReminder.findById(reminderId, (err, data) => {
+        if (err){
+            console.log(err)
+            return
+        }
+        else if (data) {
+            if (data.location.locationName !== location.locationName){
+                if(data.location.reminders.length === 1){
+                    data.delete()
+                }
+                NewReminder.findOne({"location.locationName": location.locationName}, (err, doc) => {
+                    if(err){
+                        console.log(err)
+                        return
+                    }
+                    else if (doc){
+                        data.location.reminders.push(location.reminders[0])
+                        data.save()
+                        res.send({success: true})
+                    }else{
+                        const newReminder = new NewReminder({
+                            location
+                        })
+                        newReminder.save()
+                        res.send({success: true})
+                    }
+                })
+            }else{
+                data.location.reminders = data.location.reminders.filter(dat => dat.rem_id !== id)
+                data.location.reminders.push(location.reminders[0])
+                data.save()
+                res.send({success: true})
+            }
+        }
+    })
 })
 
 router.put("/deletereminder/:reminderId/:id", (req, res) => {
