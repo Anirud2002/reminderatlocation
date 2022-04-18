@@ -19,7 +19,7 @@ function EditReminder({navigation, route}) {
     const deviceHeight = useDimensions().screen.height
     let [editReminder, setEditReminder] = useState({
         location: {
-            locationName: parentReminder.locationName,
+            locationName: parentReminder.location.locationName,
             reminders: [],
             locationDetails: {
                 lat: parentReminder.location.locationDetails.lat,
@@ -27,6 +27,7 @@ function EditReminder({navigation, route}) {
             }
         }
     })
+    console.log(editReminder)
 
     const [reminderDetails, setReminderDetails] = useState({
         rem_id: rem.rem_id,
@@ -38,7 +39,7 @@ function EditReminder({navigation, route}) {
     const handleSubmitReminder = async () => {
         editReminder.location.reminders.push(reminderDetails)
         setEditReminder(editReminder)
-        console.log(editReminder)
+         console.log(editReminder)
         await axios.put(`http://localhost:3000/reminder/edit/${parentReminder._id}/${rem.rem_id}`, editReminder)
         .then((res) => {
             if(res.data.success){
@@ -77,6 +78,7 @@ function EditReminder({navigation, route}) {
                         placeholder='Search'
                         fetchDetails={true}
                         onPress={(data, details = null) => {
+                            console.log(data)
                             setEditReminder({...editReminder, location: {...editReminder.location, 
                                 locationName: details.name,
                                 locationDetails: {
