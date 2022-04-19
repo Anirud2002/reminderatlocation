@@ -10,7 +10,7 @@ import {useDimensions} from '@react-native-community/hooks'
 import { MaterialIcons } from '@expo/vector-icons'; 
 import axios from 'axios'
 import uuid from 'react-native-uuid';
-
+import {GOOGLEAPIKEY} from '@env';
 
 function NewReminder({navigation, options}) {
     const ref = useRef()
@@ -85,7 +85,7 @@ function NewReminder({navigation, options}) {
                         }
                     }
                         query={{
-                            key: 'AIzaSyAJORjFPaRVF0UB_C-e8zwww5lNIleTIAU',
+                            key: GOOGLEAPIKEY,
                             language: 'en',
                         }}
                         styles={{
