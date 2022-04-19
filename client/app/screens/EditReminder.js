@@ -9,6 +9,7 @@ import colors from '../../config/colors';
 import {useDimensions} from '@react-native-community/hooks'
 import { MaterialIcons } from '@expo/vector-icons'; 
 import axios from 'axios'
+import {GOOGLEAPIKEY} from "@env"
 
 function EditReminder({navigation, route}) {
     const {parentReminder, rem} = route.params
@@ -90,7 +91,7 @@ function EditReminder({navigation, route}) {
                         }
                     }
                         query={{
-                            key: 'AIzaSyAJORjFPaRVF0UB_C-e8zwww5lNIleTIAU',
+                            key: GOOGLEAPIKEY,
                             language: 'en',
                         }}
                         styles={{
