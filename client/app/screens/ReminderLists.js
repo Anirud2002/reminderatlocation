@@ -8,28 +8,52 @@ import {useDimensions} from '@react-native-community/hooks';
 import colors from '../../config/colors';
 import axios from 'axios'
 import ReminderBox from '../components/ReminderBox';
+import * as TaskManager from "expo-task-manager"
+import * as Location from 'expo-location';
 
 function ReminderLists({navigation}) {
+    let [currentLocation, setCurrentLocation] = useState({})
     const deviceHeight = useDimensions().screen.height
-    const [reminders, setReminders] = useState([])
+    const [action, setAction] = useState('')
+    let [reminders, setReminders] = useState([])
     let [reminderClicked, setReminderClicked] = useState(false)
     let [activeRemId, setActiveRemId] = useState('')
-    const [action, setAction] = useState('')
     const reminderClickedRef = useRef()
     reminderClickedRef.current = reminderClicked
-
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get('http://localhost:3000/reminder/getreminders')
             .then(res => {
                 if(res.data){
-                    setReminders(res.data)
+                    reminders = res.data
+                    setReminders(reminders)
                 }
             })
         })
         return unsubscribe
     }, [navigation])
+
+    // updates user loaction oftenly
+    useEffect(async ()=> {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            alert("Permission Not Granted")
+            return;
+        }
+
+        let locationSubscription = await Location.watchPositionAsync({
+            accuracy: Location.Accuracy.BestForNavigation,
+            distanceInterval: 50 //meters
+            }, location => {
+                currentLocation = location.coords
+                setCurrentLocation(currentLocation)
+                // foreach on each reminder and then we calculate the distance
+                // between our current and location's lat and long and compare that with the
+                // the radius with each of the reminders
+                // associated with the location as a logic to push the notification
+        })
+    }, [])
 
     const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
         reminderClicked = !reminderClicked

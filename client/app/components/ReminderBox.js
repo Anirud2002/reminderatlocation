@@ -6,7 +6,8 @@ import colors from '../../config/colors';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-function ReminderBox({rem, 
+function ReminderBox({
+    rem, 
     reminderId,
     action,
     setAction,
@@ -16,7 +17,7 @@ function ReminderBox({rem,
     navigation,
     reminder
 }) {
-
+    
     const leftFadeAnimation = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
@@ -33,6 +34,7 @@ function ReminderBox({rem,
             }
             return
         }
+        
         setTimeout(() => {
             if(reminderClicked && rem.rem_id === activeRemId){
                 Animated.timing(
@@ -94,8 +96,8 @@ function ReminderBox({rem,
                             </TouchableHighlight>
                             <View>
                                 <Text style={styles.reminderTitle}>{rem.reminderTitle}</Text>
-                                {rem.remDescription && (
-                                    <Text style={styles.reminderDescription}>{rem.reminderDescription}</Text>
+                                {(rem.reminderDescription !== "") && (
+                                    <Text style={styles.reminderDescription}> 123 </Text>
                                 )}
                             </View>
                         </TouchableOpacity>
