@@ -19,6 +19,10 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 3
 app.use('/reminder', require('./routes/newReminder'))
 
+app.get('/', (req, res)=> {
+    res.json({"msg": " Yo boi welcome"})
+})
+
 app.listen(port, () => {
     console.log(`Server started on port: ${port}`)
 })
