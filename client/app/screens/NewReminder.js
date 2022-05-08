@@ -83,7 +83,7 @@ function NewReminder({navigation, options}) {
                                 }
                             }})
                         }
-                    }
+                        }
                         query={{
                             key: GOOGLEAPIKEY,
                             language: 'en',
