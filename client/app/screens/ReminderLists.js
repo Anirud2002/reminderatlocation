@@ -10,6 +10,7 @@ import axios from 'axios'
 import ReminderBox from '../components/ReminderBox';
 import * as TaskManager from "expo-task-manager"
 import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions'
 
 function ReminderLists({navigation}) {
     let [currentLocation, setCurrentLocation] = useState({})
@@ -30,30 +31,53 @@ function ReminderLists({navigation}) {
                     setReminders(reminders)
                 }
             })
+            .catch(err => console.log(err))
         })
         return unsubscribe
     }, [navigation])
 
-    // updates user loaction oftenly
+    // updates user location in regular interval
     useEffect(async ()=> {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
             alert("Permission Not Granted")
             return;
         }
-
         let locationSubscription = await Location.watchPositionAsync({
-            accuracy: Location.Accuracy.BestForNavigation,
+            accuracy: Location.Accuracy.Highest,
             distanceInterval: 50 //meters
             }, location => {
                 currentLocation = location.coords
                 setCurrentLocation(currentLocation)
-                // foreach on each reminder and then we calculate the distance
-                // between our current and location's lat and long and compare that with the
-                // the radius with each of the reminders
-                // associated with the location as a logic to push the notification
+                let latUser = currentLocation.latitude
+                let lonUser = currentLocation.longitude
+                reminders.forEach(reminder => {
+                    let latLocation = reminder.location.locationDetails.lat
+                    let lonLocation = reminder.location.locationDetails.lng
+                    let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
+                    console.log(distance)
+                })
         })
     }, [])
+
+    function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = deg2rad(lon2-lon1); 
+        var a = 
+          Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+          Math.sin(dLon/2) * Math.sin(dLon/2)
+          ; 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        var d = R * c; // Distance in km
+        return d;
+      }
+      
+      function deg2rad(deg) {
+        return deg * (Math.PI/180)
+      } 
+
 
     const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
         reminderClicked = !reminderClicked
