@@ -8,7 +8,7 @@
     "serve": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["heroku"],
   "author": "Anirud Shrestha",
   "license": "ISC",
   "dependencies": {
