@@ -6,7 +6,7 @@ const NewReminder = require('../models/NewReminder')
 router.get('/getreminders', async (req, res) => {
     await NewReminder.find({})
     .then((result) => {
-        res.send(result)
+        res.json({"result": result})
     })
 })
 
@@ -86,6 +86,7 @@ router.put("/deletereminder/:reminderId/:id", (req, res) => {
             doc.delete().then(() => {
                 NewReminder.find({})
                 .then(result => res.send(result))
+
             })
         } 
         else{

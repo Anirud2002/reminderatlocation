@@ -24,10 +24,10 @@ function ReminderLists({navigation}) {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            axios.get('http://localhost:3000/reminder/getreminders')
+            axios.get('https://reminder-at-location-server.herokuapp.com/reminder/getreminders')
             .then(res => {
                 if(res.data){
-                    reminders = res.data
+                    reminders = res.data.result
                     setReminders(reminders)
                 }
             })
@@ -51,12 +51,14 @@ function ReminderLists({navigation}) {
                 setCurrentLocation(currentLocation)
                 let latUser = currentLocation.latitude
                 let lonUser = currentLocation.longitude
-                reminders.forEach(reminder => {
-                    let latLocation = reminder.location.locationDetails.lat
-                    let lonLocation = reminder.location.locationDetails.lng
-                    let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
-                    console.log(distance)
-                })
+                if(reminders.length > 0){
+                    reminders.forEach(reminder => {
+                        let latLocation = reminder.location.locationDetails.lat
+                        let lonLocation = reminder.location.locationDetails.lng
+                        let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
+                        console.log(distance)
+                    })
+                }
         })
     }, [])
 
@@ -103,30 +105,33 @@ function ReminderLists({navigation}) {
         <SafeAreaView style={styles.background}>
             <LogoFaded style={styles.imageBackground}/>
             <Text style={styles.heading}>Reminders</Text>
-            <View style={styles.reminderContainer}>
-                {reminders.map(reminder => {
-                    return <View key={reminder._id} style={styles.reminder}>
-                        <View style={styles.location}>
-                            <View><Ionicons name="location-sharp" size={24} color={colors.secondary} /></View>
-                            <View><Text style={styles.locationName}>{reminder.location.locationName}</Text></View>
+            {reminders.length > 0 && (
+                <View style={styles.reminderContainer}>
+                    {reminders.map(reminder => {
+                        console.log(reminders)
+                        return <View key={reminder._id} style={styles.reminder}>
+                            <View style={styles.location}>
+                                <View><Ionicons name="location-sharp" size={24} color={colors.secondary} /></View>
+                                <View><Text style={styles.locationName}>{reminder.location.locationName}</Text></View>
+                            </View>
+                            {reminder.location.reminders.map(rem => {
+                                return <ReminderBox
+                                        action={action}
+                                        setAction={setAction}
+                                        handleDoneAndDeleteReminder={handleDoneAndDeleteReminder}
+                                        rem={rem}
+                                        reminderId={reminder._id}
+                                        reminder={reminder}
+                                        key={rem.rem_id}
+                                        navigation={navigation}
+                                        reminderClicked={reminderClicked}
+                                        activeRemId={activeRemId}
+                                        />
+                            })}
                         </View>
-                        {reminder.location.reminders.map(rem => {
-                            return <ReminderBox
-                                    action={action}
-                                    setAction={setAction}
-                                    handleDoneAndDeleteReminder={handleDoneAndDeleteReminder}
-                                    rem={rem}
-                                    reminderId={reminder._id}
-                                    reminder={reminder}
-                                    key={rem.rem_id}
-                                    navigation={navigation}
-                                    reminderClicked={reminderClicked}
-                                    activeRemId={activeRemId}
-                                    />
-                        })}
-                    </View>
-                })}
-            </View>
+                    })}
+                </View>
+            )}
             <View style={{...styles.addReminderBtn, top: deviceHeight - 200}}>
                 <Entypo onPress={() => navigation.navigate('NewReminder')}
                     size={50} name="plus"
