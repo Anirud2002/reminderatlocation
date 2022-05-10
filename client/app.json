@@ -10,9 +10,18 @@
     },
     "assetBundlePatterns": [
       "**/*"
-    ],
+    ],    
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription":"Brother can I use your location?",
+        "NSLocationAlwaysUsageDescription": "I want to know your location to hack it",
+        "UIBackgroundModes": [
+          "location",
+          "fetch"
+        ]
+      }
     }
   }
 }
+
