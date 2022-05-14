@@ -51,14 +51,13 @@ function ReminderLists({navigation}) {
                 setCurrentLocation(currentLocation)
                 let latUser = currentLocation.latitude
                 let lonUser = currentLocation.longitude
-                if(reminders.length > 0){
-                    reminders.forEach(reminder => {
-                        let latLocation = reminder.location.locationDetails.lat
-                        let lonLocation = reminder.location.locationDetails.lng
-                        let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
-                        console.log(distance)
-                    })
-                }
+                // if(reminders.length > 0){
+                //     reminders.forEach(reminder => {
+                //         let latLocation = reminder.location.locationDetails.lat
+                //         let lonLocation = reminder.location.locationDetails.lng
+                //         let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
+                //     })
+                // }
         })
     }, [])
 
@@ -108,7 +107,6 @@ function ReminderLists({navigation}) {
             {reminders.length > 0 && (
                 <View style={styles.reminderContainer}>
                     {reminders.map(reminder => {
-                        console.log(reminders)
                         return <View key={reminder._id} style={styles.reminder}>
                             <View style={styles.location}>
                                 <View><Ionicons name="location-sharp" size={24} color={colors.secondary} /></View>
