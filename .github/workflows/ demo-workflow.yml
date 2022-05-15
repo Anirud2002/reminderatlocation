@@ -1,6 +1,7 @@
 name: GitHub Actions Demo
 on: [push]
 jobs:
+  Explore-GitHub-Actions:
   runs-on: ubuntu-latest
   steps:
     - run: echo "Please like, comment and subscribe to my youtube channel"
