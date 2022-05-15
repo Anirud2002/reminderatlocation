@@ -3,6 +3,7 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
-    steps:
-      - name: Anirud's Youtube Channel
-      - run: echo "Please like, comment and subscribe to my youtube channel"
+    jobs:
+      steps:
+        - name: Anirud's Youtube Channel
+        - run: echo "Please like, comment and subscribe to my youtube channel"
