@@ -1,11 +1,17 @@
 name: GitHub Actions Demo
-on: [pull_request]
+on:
+  pull_request:
+    branches:
+      - master
 jobs:
   Deploy-Server:
     runs-on: ubuntu-latest
     name: Deploying server on heroku
     steps:
       - uses: actions/checkout@v3
-      - run: |
-          git config --global user.name "Anirud Shrestha"
-          git config --global user.email "anirudshrestha@boisestate.edu"
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "reminder-at-location-server"
+          heroku_email: "eduanirud@gmail.com"
+          appdir: "backend"
