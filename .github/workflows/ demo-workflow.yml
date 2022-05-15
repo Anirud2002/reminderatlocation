@@ -1,0 +1,12 @@
+name: GitHub Actions Demo
+on: [pull_request]
+jobs:
+  Deploy-Server:
+    runs-on: ubuntu-latest
+    name: Deploying server on heroku
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          git config --global user.name "Anirud Shrestha"
+          git config --global user.email "anirudshrestha@boisestate.edu"
+          cd backend && git push heroku master
