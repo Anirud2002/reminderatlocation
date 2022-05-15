@@ -5,4 +5,4 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploying server on heroku
     steps:
-      - run: cd backend && ls
+      - run: ls
