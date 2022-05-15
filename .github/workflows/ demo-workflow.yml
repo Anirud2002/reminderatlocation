@@ -5,5 +5,5 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploying server on heroku
     steps:
-      uses: actions/checkout@v3
-      run: cd backend && ls
+      - uses: actions/checkout@v3
+      - run: cd backend && ls
