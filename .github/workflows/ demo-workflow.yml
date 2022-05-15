@@ -6,4 +6,5 @@ jobs:
     name: Deploying server on heroku
     steps:
       - uses: actions/checkout@v3
-      - run: cd backend && ls
+      - run: cd backend
+      - run: ls
