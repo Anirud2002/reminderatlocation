@@ -1,8 +1,9 @@
 name: GitHub Actions Demo
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Deploy-Server:
     runs-on: ubuntu-latest
     name: Deploying server on heroku
     steps:
-      - run: ls
+      uses: actions/checkout@v3
+      run: cd backend && ls
