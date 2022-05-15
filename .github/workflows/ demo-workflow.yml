@@ -6,4 +6,7 @@ jobs:
     name: Deploying server on heroku
     steps:
       - uses: actions/checkout@v3
-      - run: cd backend && git add . && git commit -am 'deploying the server to heroku' && git push heroku master
+      - run: |
+          git config --global user.name "Anirud Shrestha"
+          git config --global user.email "anirudshrestha@boisestate.edu"
+          cd backend && git add . && git commit -am 'deploying the server to heroku' && git push heroku master
