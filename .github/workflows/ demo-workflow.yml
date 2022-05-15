@@ -3,6 +3,7 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
-    name: Anirud Shrestha's YouTube Channel
+    name: Deploying server on heroku
     steps:
-      - run: echo "Please like, comment and subscribe to my youtube channel"
+      - run: cd backend
+      - run: ls
