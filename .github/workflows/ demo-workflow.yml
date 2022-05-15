@@ -3,5 +3,6 @@ on: [push]
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
+    name: Anirud Shrestha's YouTube Channel
     steps:
       - run: echo "Please like, comment and subscribe to my youtube channel"
