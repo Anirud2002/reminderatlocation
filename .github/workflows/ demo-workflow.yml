@@ -9,4 +9,3 @@ jobs:
       - run: |
           git config --global user.name "Anirud Shrestha"
           git config --global user.email "anirudshrestha@boisestate.edu"
-          cd backend && git push heroku master
