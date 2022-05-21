@@ -16,7 +16,7 @@ router.post('/add', (req, res) => {
     NewReminder.findOne({"location.locationName": location.locationName}, (err, data) => {
         if (err){
             console.log(err)
-            res.send({success: false})
+            res.send({success: false, message: "sorry brother"})
         }
         else if(data){
             data.location.reminders.push(location.reminders[0])
