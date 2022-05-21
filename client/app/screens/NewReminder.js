@@ -36,7 +36,7 @@ function NewReminder({navigation, options}) {
     const handleSubmitReminder = async () => {
         newReminder.location.reminders.push(reminderDetails)
         setNewReminder(newReminder)
-        await axios.post('http://localhost:3000/reminder/add', newReminder)
+        await axios.post('https://reminder-at-location-server.herokuapp.com/reminder/add', newReminder)
         .then((res) => {
             if(res.data.success){
                 setNewReminder({

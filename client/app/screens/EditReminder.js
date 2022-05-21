@@ -41,7 +41,7 @@ function EditReminder({navigation, route}) {
         editReminder.location.reminders.push(reminderDetails)
         setEditReminder(editReminder)
          console.log(editReminder)
-        await axios.put(`http://localhost:3000/reminder/edit/${parentReminder._id}/${rem.rem_id}`, editReminder)
+        await axios.put(`https://reminder-at-location-server.herokuapp.com/reminder/edit/${parentReminder._id}/${rem.rem_id}`, editReminder)
         .then((res) => {
             if(res.data.success){
                 setEditReminder({
