@@ -91,7 +91,7 @@ function ReminderLists({navigation}) {
 
         setTimeout(() => {
             if(reminderClickedRef.current){
-                axios.put(`http://localhost:3000/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
+                axios.put(`https://reminder-at-location-server.herokuapp.com/reminder/deletereminder/${reminderParentId}/${reminder.rem_id}`, reminder)
                 .then(res => {
                     setReminders(res.data)
                     setReminderClicked(false)
