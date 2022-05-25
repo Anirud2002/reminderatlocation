@@ -28,7 +28,6 @@ function EditReminder({navigation, route}) {
             }
         }
     })
-    console.log(editReminder)
 
     const [reminderDetails, setReminderDetails] = useState({
         rem_id: rem.rem_id,
@@ -79,7 +78,6 @@ function EditReminder({navigation, route}) {
                         placeholder='Search'
                         fetchDetails={true}
                         onPress={(data, details = null) => {
-                            console.log(data)
                             setEditReminder({...editReminder, location: {...editReminder.location, 
                                 locationName: details.name,
                                 locationDetails: {
