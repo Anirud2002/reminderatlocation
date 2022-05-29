@@ -6,22 +6,35 @@ import { Entypo } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import {useDimensions} from '@react-native-community/hooks';
 import colors from '../../config/colors';
-import axios from 'axios'
+import axios from 'axios';
+import * as Device from 'expo-device';
 import ReminderBox from '../components/ReminderBox';
-import * as TaskManager from "expo-task-manager"
 import * as Location from 'expo-location';
-import * as Permissions from 'expo-permissions'
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
 
 function ReminderLists({navigation}) {
     let [currentLocation, setCurrentLocation] = useState({})
-    const deviceHeight = useDimensions().screen.height
-    const [action, setAction] = useState('')
     let [reminders, setReminders] = useState([])
     let [reminderClicked, setReminderClicked] = useState(false)
     let [activeRemId, setActiveRemId] = useState('')
+    const deviceHeight = useDimensions().screen.height
+    const [action, setAction] = useState('')
     const reminderClickedRef = useRef()
+    const [expoPushToken, setExpoPushToken] = useState('');
+    const [notification, setNotification] = useState(false);
+    const notificationListener = useRef();
+    const responseListener = useRef();
     reminderClickedRef.current = reminderClicked
 
+    // gets all the reminders from database
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             axios.get('https://reminder-at-location-server.herokuapp.com/reminder/getreminders')
@@ -45,22 +58,94 @@ function ReminderLists({navigation}) {
         }
         let locationSubscription = await Location.watchPositionAsync({
             accuracy: Location.Accuracy.Highest,
-            distanceInterval: 50 //meters
+            distanceInterval: 5 //meters
             }, location => {
                 currentLocation = location.coords
                 setCurrentLocation(currentLocation)
                 let latUser = currentLocation.latitude
                 let lonUser = currentLocation.longitude
-                // if(reminders.length > 0){
-                //     reminders.forEach(reminder => {
-                //         let latLocation = reminder.location.locationDetails.lat
-                //         let lonLocation = reminder.location.locationDetails.lng
-                //         let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
-                //     })
-                // }
+                if(reminders.length > 0){
+                    reminders.forEach(reminder => {
+                        let latLocation = reminder.location.locationDetails.lat
+                        let lonLocation = reminder.location.locationDetails.lng
+                        let distance = getDistanceFromLatLonInKm(latLocation, lonLocation, latUser, lonUser)
+                        if(validateNotificationCondition(reminder, distance)){
+                            schedulePushNotification()
+                        }
+                    })
+                }
         })
+
+        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+        setNotification(notification);
+        });
+
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log(response);
+        });
+
+        return () => {
+            locationSubscription.unsubscribe();
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+        }
     }, [])
 
+    async function registerForPushNotificationsAsync() {
+        let token;
+        if (Device.isDevice) {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            token = (await Notifications.getExpoPushTokenAsync()).data;
+            console.log(token);
+        } else {
+            alert('Must use physical device for Push Notifications');
+        }
+        
+        if (Platform.OS === 'android') {
+            Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+        });
+    }
+    
+        return token;
+    }
+
+    async function schedulePushNotification() {
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: "You've got mail! 📬",
+            body: 'Here is the notification body',
+            data: { data: 'goes here' },
+          },
+          trigger: { seconds: 2 },
+        });
+    }
+
+    // validates if notification should be pushed
+    let validateNotificationCondition = (reminder, distance) => {
+        reminder.location.reminders.forEach(rem => {
+            if (rem.radius >= distance){
+                return true
+            }
+            return false
+        })
+    }
+
+    // gets distance between current user's location and desination in miles
     function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
         var R = 6371; // Radius of the earth in km
         var dLat = deg2rad(lat2-lat1);  // deg2rad below
@@ -72,14 +157,14 @@ function ReminderLists({navigation}) {
           ; 
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
         var d = R * c; // Distance in km
-        return d;
+        return 0.62137 * d; // distance in mile
       }
       
       function deg2rad(deg) {
         return deg * (Math.PI/180)
       } 
 
-
+    // handles done and delete event for reminderBox
     const handleDoneAndDeleteReminder = (reminderParentId, reminder) => {
         reminderClicked = !reminderClicked
         setReminderClicked(reminderClicked)
